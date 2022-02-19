@@ -1,5 +1,5 @@
 {
-  "name": "fullstackopen2020-part3",
+  "name": "fullstackopen-part3",
   "version": "1.0.0",
   "description": "Part 3 of online course Full Stack Open",
   "main": "index.js",
@@ -10,19 +10,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Rikkokiri/FullStackOpen2020-Part3.git"
+    "url": "git+https://github.com/Rikkokiri/FullStackOpen-Part3.git"
   },
   "author": "Ossian Rajala",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Rikkokiri/FullStackOpen2020-Part3/issues"
+    "url": "https://github.com/Rikkokiri/FullStackOpen-Part3/issues"
   },
-  "homepage": "https://github.com/Rikkokiri/FullStackOpen2020-Part3#readme",
+  "homepage": "https://github.com/Rikkokiri/FullStackOpen-Part3#readme",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.15"
   }
 }
