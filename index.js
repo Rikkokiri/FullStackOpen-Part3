@@ -24,6 +24,9 @@ app.use(
   )
 );
 
+// Serve frontend
+app.use(express.static('build'));
+
 let contacts = [
   {
     name: 'Arto Hellas',
