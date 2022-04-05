@@ -8,6 +8,7 @@
     "deploy": "git push heroku master",
     "deploy:full": "npm run build:ui && git add . && git commit -m \"build: deploy app\" && git push && npm run deploy",
     "dev": "nodemon index.js",
+    "lint": "eslint .",
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -30,6 +31,7 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "eslint": "^8.12.0",
     "nodemon": "^2.0.15"
   }
 }
