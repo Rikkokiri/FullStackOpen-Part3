@@ -4,6 +4,7 @@ const app = express();
 const morgan = require('morgan');
 const cors = require('cors');
 const Person = require('./models/person');
+const { response } = require('express');
 
 app.use(
   cors({
@@ -68,7 +69,10 @@ app.put('/api/persons/:id', (req, res, next) => {
     ...(body.name && { name: body.name }),
   };
 
-  Person.findOneAndUpdate({ _id: req.params.id }, person, { new: true })
+  Person.findOneAndUpdate({ _id: req.params.id }, person, {
+    new: true,
+    runValidators: true,
+  })
     .then((updatedPerson) => {
       res.json(updatedPerson);
     })
@@ -141,8 +145,9 @@ const errorHandler = (error, _req, res, next) => {
 
   if (error.name === 'CastError') {
     return res.status(400).send({ error: 'Malformatted id' });
+  } else if (error.name === 'ValidationError') {
+    return res.status(400).json({ error: error.message });
   }
-
   next(error);
 };
 
