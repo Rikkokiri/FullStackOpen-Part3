@@ -87,11 +87,7 @@ app.delete('/api/persons/:id', (req, res) => {
   res.status(204).end();
 });
 
-const generateId = () => {
-  return Math.floor(Math.random() * 1000000000);
-};
-
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body;
 
   // The request is not allowed to succeed, if:
@@ -110,20 +106,32 @@ app.post('/api/persons', (req, res) => {
   }
 
   // 409: Conflict (https://tools.ietf.org/html/rfc7231#section-6.5.8)
-  if (!isNameUnique(body.name)) {
-    return res.status(409).json({
-      error: 'Name must be unique',
-    });
-  }
+  Person.findOne({ name: body.name })
+    .then((result) => {
+      console.log('Find result: ', result);
 
-  const contact = {
-    name: body.name,
-    number: body.number,
-    id: generateId(),
-  };
+      if (result) {
+        res
+          .status(409)
+          .json({
+            error: 'Name must be unique',
+          })
+          .end();
+      } else {
+        const person = new Person({
+          name: body.name,
+          number: body.number,
+        });
 
-  contacts = contacts.concat(contact);
-  res.json(contact);
+        return person
+          .save()
+          .then((savedPerson) => {
+            res.json(savedPerson);
+          })
+          .catch((error) => next(error));
+      }
+    })
+    .catch((err) => next(err));
 });
 
 const unknownEndpoint = (_req, res) => {
@@ -144,13 +152,6 @@ const errorHandler = (error, _req, res, next) => {
 
 // this has to be the last loaded middleware.
 app.use(errorHandler);
-
-const isNameUnique = (name) => {
-  let matches = contacts.filter(
-    (contact) => contact.name.toLowerCase() == name.toLowerCase()
-  );
-  return matches.length === 0;
-};
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
