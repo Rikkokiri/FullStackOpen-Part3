@@ -26,29 +26,6 @@ app.use(
   )
 );
 
-let contacts = [
-  {
-    name: 'Arto Hellas',
-    number: '040-123456',
-    id: 1,
-  },
-  {
-    name: 'Ada Lovelace',
-    number: '39-44-5323523',
-    id: 2,
-  },
-  {
-    name: 'Dan Abramov',
-    number: '12-43-234345',
-    id: 3,
-  },
-  {
-    name: 'Mary Poppendieck',
-    number: '39-23-6423122',
-    id: 4,
-  },
-];
-
 app.get('/', (_req, res) => {
   res.send('Hello world');
 });
@@ -76,6 +53,24 @@ app.get('/api/persons/:id', (req, res, next) => {
       } else {
         res.status(404).end();
       }
+    })
+    .catch((error) => next(error));
+});
+
+/**
+ * For updating person details
+ */
+app.put('/api/persons/:id', (req, res, next) => {
+  const body = req.body;
+
+  const person = {
+    ...(body.number && { number: body.number }),
+    ...(body.name && { name: body.name }),
+  };
+
+  Person.findOneAndUpdate({ _id: req.params.id }, person, { new: true })
+    .then((updatedPerson) => {
+      res.json(updatedPerson);
     })
     .catch((error) => next(error));
 });
