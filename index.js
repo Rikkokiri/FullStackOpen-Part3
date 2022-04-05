@@ -1,4 +1,3 @@
-const { response } = require('express');
 require('dotenv').config();
 const express = require('express');
 const app = express();
@@ -8,7 +7,7 @@ const Person = require('./models/person');
 
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
   })
 );
 
@@ -19,7 +18,6 @@ morgan.token('post-body', function getBody(req) {
   return JSON.stringify(req.body);
 });
 
-// app.use(morgan('tiny'))
 app.use(
   morgan(
     ':method :url :status :res[content-length] - :response-time ms :post-body'
@@ -52,11 +50,11 @@ let contacts = [
   },
 ];
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.send('Hello world');
 });
 
-app.get('/info', (req, res) => {
+app.get('/info', (_req, res) => {
   Person.find({}).then((people) => {
     res.send(
       `<p>Phonebook has info for ${people.length} people</p>
@@ -71,9 +69,7 @@ app.get('/api/persons', (_req, res) => {
   });
 });
 
-app.get('/api/persons/:id', (req, res) => {
-  const id = req.params.id;
-
+app.get('/api/persons/:id', (req, res, next) => {
   Person.findById(req.params.id)
     .then((person) => {
       if (person) {
@@ -82,10 +78,7 @@ app.get('/api/persons/:id', (req, res) => {
         res.status(404).end();
       }
     })
-    .catch((error) => {
-      console.log(error);
-      res.status(500).end();
-    });
+    .catch((error) => next(error));
 });
 
 app.delete('/api/persons/:id', (req, res) => {
@@ -133,11 +126,24 @@ app.post('/api/persons', (req, res) => {
   res.json(contact);
 });
 
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' });
+const unknownEndpoint = (_req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' });
 };
 
 app.use(unknownEndpoint);
+
+const errorHandler = (error, _req, res, next) => {
+  console.error(error.message);
+
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'Malformatted id' });
+  }
+
+  next(error);
+};
+
+// this has to be the last loaded middleware.
+app.use(errorHandler);
 
 const isNameUnique = (name) => {
   let matches = contacts.filter(
