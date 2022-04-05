@@ -11,6 +11,8 @@ app.use(
   })
 );
 
+// Serve frontend
+app.use(express.static('build'));
 app.use(express.json());
 
 // Configure middleware Morgan for logging
@@ -23,9 +25,6 @@ app.use(
     ':method :url :status :res[content-length] - :response-time ms :post-body'
   )
 );
-
-// Serve frontend
-app.use(express.static('build'));
 
 let contacts = [
   {
@@ -81,10 +80,12 @@ app.get('/api/persons/:id', (req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.delete('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id);
-  contacts = contacts.filter((contact) => contact.id !== id);
-  res.status(204).end();
+app.delete('/api/persons/:id', (req, res, next) => {
+  Person.findByIdAndRemove(req.params.id)
+    .then((_result) => {
+      res.status(204).end();
+    })
+    .catch((error) => next(error));
 });
 
 app.post('/api/persons', (req, res, next) => {
