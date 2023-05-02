@@ -15,7 +15,7 @@ app.use(
 app.use(express.static('build'));
 app.use(express.json());
 
-// Configure middleware Morgan for logging
+// Configure middleware Morgan for logging (ex. 3.8)
 morgan.token('post-body', function getBody(req) {
   return JSON.stringify(req.body);
 });
